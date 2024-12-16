@@ -4,6 +4,7 @@ import {connect} from 'mongoose';
 import { config } from 'dotenv';
 import mainRouter from './routes/index.js';
 
+
 config();
 
 const app=express()
@@ -24,6 +25,7 @@ async function mongoConnect(){
 }
 
 app.listen(PORT,async()=>{
+
     await mongoConnect();
     console.log(`PORT started on port ${PORT}`)
 })
