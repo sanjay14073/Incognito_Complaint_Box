@@ -49,6 +49,11 @@ const ComplaintSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  priority_factor:{
+    type:Number,
+    default:0.0,
+    required:true
+  }
 });
 
 const Complaint = mongoose.model("Complaint", ComplaintSchema);

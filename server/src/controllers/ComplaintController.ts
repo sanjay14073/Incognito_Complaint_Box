@@ -28,6 +28,8 @@ class ComplaintController{
         //generate complaint summary
         const prompt=`Summarize this complaint within 200 words make sure that its meaning doesnot change ${complaint_to_be_added}`;
         let content=(await model.generateContent([prompt]));
+        //We need to make external call to our in house ML model to give a priority rating
+
         //Save it
         mycomplaint.summarized_complaint=content.response.text();
         mycomplaint.complaint=complaint_to_be_added;
