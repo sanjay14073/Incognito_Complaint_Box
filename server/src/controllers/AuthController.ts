@@ -25,10 +25,10 @@ class AuthController{
     }
 
     async signup(req:Request,res:Response){
-        const { username, email, password } = req.body;
+        const { username, email, password,phoneNo } = req.body;
         const hashedPassword = bcryptjs.hashSync(password, 10);
         let uid=v4();
-        const newUser = new User({ username, email, password: hashedPassword,uuid:uid,complaints:[]});
+        const newUser = new User({ username, email, password: hashedPassword,uuid:uid,complaints:[],phoneNo});
         try {
             await newUser.save();
             res.status(201).json({ message: 'User created successfully' });

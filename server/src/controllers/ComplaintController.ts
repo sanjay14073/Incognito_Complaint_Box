@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import { Complaint, User } from "../models/index.js";
 import { v4 } from "uuid";
 import bcryptjs from 'bcryptjs';
+import client from "../utils/RedisSetup.js";
 
 
 class ComplaintController{
@@ -12,7 +13,7 @@ class ComplaintController{
         let user=await User.findOne({uuid})
         if(user===null){
             res.status(404).json({"message":"User Not Found"})
-            return
+            return;
         }
         let non_hashed_complaint_id=uuid+v4()
         const saltrounds=10;
@@ -32,11 +33,40 @@ class ComplaintController{
         mycomplaint.title=title;
     
         await mycomplaint.save();
-        
+        await client.set(non_hashed_complaint_id,complaint_id);
+        res.status(201).json({"message":"Added Complaint Sucessfully"})
         }catch(e:any){
             console.log(e.message);
             res.status(400).json({"message":e.message})
         }
+    }
+    async getMyComplaints(req:Request,res:Response){
+        const {uuid}=req.body;
+        let user=await User.findOne({uuid})
+        if(user===null){
+            res.status(404).json({"message":"User Not Found"})
+            return;
+        }
+        let complaints=user.previous_complaints;
+        let newlist=[]
+        for(let i=0;i<complaints.length;i++){
+            try{
+                console.log(complaints[i])
+                let x=await client.get(complaints[i]);
+                console.log(x);
+                if(x!==null){
+                    let complaint=await Complaint.findOne({complaint_id:x});
+                    if(complaint!==null){
+                        newlist.push(complaint)
+                    }
+                }
+            }catch(e:any){
+                console.log(e.message)
+                res.status(404).json({"message":"was not able to find"})
+            }
+        }
+        //console.log({"the complaint list of a user":newlist})
+        res.status(201).json({"the complaint list of a user":newlist})
     }
 }
 
