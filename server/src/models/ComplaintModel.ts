@@ -8,12 +8,18 @@ const ComplaintSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  summarized_complaint:{
+    type:String,
+    required:true,
+    default:""
+  },
   complaint_proof: {
     type: String,
   },
   issue_category: {
-    type: String,
+    type: [String],
     required: true,
+    default:[]
   },
   complaint_id: {
     type: String,

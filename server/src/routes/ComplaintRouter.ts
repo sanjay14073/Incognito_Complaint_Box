@@ -5,4 +5,5 @@ const complaintRouter=Router()
 complaintRouter.post('/addComplaint',ComplaintController.addComplaint);
 complaintRouter.get('/myComplaint',ComplaintController.getMyComplaints);
 
+
 export default complaintRouter;

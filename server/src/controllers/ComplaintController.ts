@@ -3,6 +3,7 @@ import { Complaint, User } from "../models/index.js";
 import { v4 } from "uuid";
 import bcryptjs from 'bcryptjs';
 import client from "../utils/RedisSetup.js";
+import model from "../utils/GeminiSetup.js";
 
 
 class ComplaintController{
@@ -23,9 +24,12 @@ class ComplaintController{
         user.previous_complaints.push(non_hashed_complaint_id);
         await user.save();
         let complaint_to_be_added=complaint;
-        if(complaint.length>100){
-           complaint_to_be_added="";
-        }
+        
+        //generate complaint summary
+        const prompt=`Summarize this complaint within 200 words make sure that its meaning doesnot change ${complaint_to_be_added}`;
+        let content=(await model.generateContent([prompt]));
+        //Save it
+        mycomplaint.summarized_complaint=content.response.text();
         mycomplaint.complaint=complaint_to_be_added;
         mycomplaint.complaint_proof=complaint_proof;
         mycomplaint.issue_category=issue_category;
