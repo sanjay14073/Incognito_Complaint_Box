@@ -4,6 +4,7 @@ import { v4 } from "uuid";
 import bcryptjs from 'bcryptjs';
 import client from "../utils/RedisSetup.js";
 import model from "../utils/GeminiSetup.js";
+import axios from "axios";
 
 
 class ComplaintController{
@@ -25,13 +26,49 @@ class ComplaintController{
         await user.save();
         let complaint_to_be_added=complaint;
         
-        //generate complaint summary
-        const prompt=`Summarize this complaint within 200 words make sure that its meaning doesnot change ${complaint_to_be_added}`;
-        let content=(await model.generateContent([prompt]));
         //We need to make external call to our in house ML model to give a priority rating
 
+        //generate summary
+        try {
+            let response = await axios.post('http://127.0.0.1:5000/getSummary', {
+                message: complaint_to_be_added
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            let data = response.data;
+         //   complaint = data.summary;
+            mycomplaint.summarized_complaint=data.summary;
+
+            //Get score and normalize
+            response = await axios.post('http://127.0.0.1:5000/getScore', {
+                complaint: complaint_to_be_added
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            data= response.data;
+            let score=data.index;
+            response = await axios.post('http://127.0.0.1:5000/normalize', {
+                score: score,
+                categories: issue_category
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            data=response.data;
+            mycomplaint.priority_factor=data.complaint_severity_score;
+
+
+        } catch (e) {
+            console.log("Error:", e);
+        }
+
         //Save it
-        mycomplaint.summarized_complaint=content.response.text();
         mycomplaint.complaint=complaint_to_be_added;
         mycomplaint.complaint_proof=complaint_proof;
         mycomplaint.issue_category=issue_category;

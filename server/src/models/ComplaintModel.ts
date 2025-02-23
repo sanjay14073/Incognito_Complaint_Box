@@ -36,11 +36,6 @@ const ComplaintSchema = new mongoose.Schema({
     required:true,
     default:"www.google.com"
   },
-  curStatus: {
-    type: String,
-    required: true,
-    default: "Complaint taken",
-  },
   lastupdate: {
     type: Date,
     default: Date.now,
@@ -53,6 +48,10 @@ const ComplaintSchema = new mongoose.Schema({
     type:Number,
     default:0.0,
     required:true
+  },
+  comments:{
+    type:[String],
+    default:[]
   }
 });
 
