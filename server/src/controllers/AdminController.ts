@@ -7,6 +7,7 @@ class AdminController {
     // Get all complaints
     async getAllComplaints(req: Request, res: Response) {
         try {
+           
             let complaint_list = await Complaint.find();
             res.status(200).json({ "complaints": complaint_list });
         } catch (e) {
@@ -27,8 +28,8 @@ class AdminController {
                     new Date().toISOString(),
                     comments || `Marked as ${status}`
                 ].join('|');
-
-                complaintToBeUpdated.status = status == "Completed" ? "resolved" : "in-progress";
+                console.log(status)
+                complaintToBeUpdated.status = status === "completed" ? "resolved" : "in-progress";
                 complaintToBeUpdated.comments.push(commentString);
                 complaintToBeUpdated.lastupdate = new Date(Date.now());
                 await complaintToBeUpdated.save();
@@ -67,6 +68,48 @@ class AdminController {
             res.status(404).json({ "message": "Something Went Wrong" });
         }
     }
+   // render complaints according to role
+   // render complaints according to role
+    async getComplaintByRole(req: any, res: any) {
+    try {
+      // Define role-based access control
+      const accessControl:any= {
+        "vc": ["infrastructure", "maintenance","others","hostel","faculty","library"],
+        "prince":["infrastructure", "maintenance","others","hostel","faculty","library"],
+        "admin":[ "infrastructure"]
+        // Add more roles and their permitted categories as needed
+      };
+  
+      // Get user role
+      let role = req.body.user.role??"";
+      role=role.toLowerCase();
+  
+      // If role not found in access control, deny access
+      if (!accessControl[role]) {
+        return res.status(403).json({ message: "Unauthorized role" });
+      }
+  
+      const allowedCategories = accessControl[role];
+      console.log(allowedCategories)
+      // Fetch all complaints
+      let complaints = await Complaint.find({});
+  
+      // Filter complaints based on allowed categories
+      let complaintsOfCategory = complaints.filter((complaint) =>
+        complaint.issue_category.some((category: string) =>
+          allowedCategories.includes(category.toLowerCase())
+        )
+      );
+
+  
+      res.status(200).json({ complaints: complaintsOfCategory });
+  
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: "Something Went Wrong" });
+    }
+  }
+  
 
     // Get complaints by category for admin
     async complaintsByCategoryAdmin(req: Request, res: Response) {
@@ -165,7 +208,7 @@ class AdminController {
     }
 
     // Generate custom reports using AI
-    async getResultsFromCustomQueries(req: Request, res: Response) {
+    async getResultsFromGenAi(req: any, res: any) {
         try {
             const { question } = req.body;
             
@@ -175,10 +218,11 @@ class AdminController {
 
             // Initialize Generative AI
             const genAI = new GoogleGenerativeAI(process.env.API_KEY || '');
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             
             // Generate prompt for Complaint model queries only
-            const prompt = this.generateCustomQueryPrompt(question);
+            const admin=new AdminController()
+            const prompt = admin.generateCustomQueryPrompt(question);
             const result = await model.generateContent([prompt]);
             
             // Extract and clean the generated query
@@ -186,12 +230,12 @@ class AdminController {
                 .replace("javascript", "")
 
             // Security validation
-            if(!this.isValidQuery(generatedQuery)) {
+            if(!admin.isValidQuery(generatedQuery)) {
                 throw new Error('Invalid query generated - only Complaint model queries are allowed');
             }
 
             // Execute the query safely
-            const data = await this.executeGeneratedQuery(generatedQuery);
+            const data = await admin.executeGeneratedQuery(generatedQuery);
 
             // Return the results
             res.status(200).json({

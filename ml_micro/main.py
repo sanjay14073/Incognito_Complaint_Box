@@ -13,7 +13,7 @@ score_tokenizer = AutoTokenizer.from_pretrained('nlptown/bert-base-multilingual-
 tag_weights = {
     "women": 5, "assault": 5, "ragging": 5,
     "food": 4, "hostel": 4, "appliances": 3,
-    "others": 1
+    "others": 1,"infrastructure": 3
 }
 
 @app.route('/getSummary', methods=["POST"])
@@ -45,12 +45,12 @@ def getScore():
 @app.route('/normalize', methods=['POST'])
 def getOverallScore():
     data = request.get_json(force=True)
-
+    print(data['categories'],data['score'])
     if 'categories' not in data or 'score' not in data:
         return jsonify({"error": "Missing 'categories' or 'score'"}), 400
 
     if not isinstance(data['categories'], list) or not isinstance(data['score'], (int, float)):
-        return jsonify({"error": "Invalid data types"}), 400
+        return jsonify({"error" : [data['score'],data['categories']]}), 400
 
     final_score = sum(tag_weights.get(tag.lower(), 1) for tag in data['categories'])
     severity_score = (data['score'] * final_score)
@@ -58,5 +58,5 @@ def getOverallScore():
     return jsonify({"complaint_severity_score": severity_score})
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)
 

@@ -24,7 +24,9 @@ export const generateToken = (user: { _id: string; role: string }): string => {
 
 // Base token verification
 export const verifyToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies?.access_token || req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  const token = req.cookies?.access_token || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
+
 
   if (!token) {
     return next(errorHandler(401, 'You are not authenticated!'));
@@ -37,6 +39,7 @@ export const verifyToken = (req: AuthenticatedRequest, res: Response, next: Next
     
     // Type assertion to JwtPayload
     req.user = decoded as JwtPayload;
+    console.log(req.user)
     next();
   });
 };
@@ -72,3 +75,4 @@ export const checkRole = (roles: string[]) => {
     });
   };
 };
+

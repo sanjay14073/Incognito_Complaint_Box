@@ -17,6 +17,7 @@ class AuthController{
             const expiryDate = new Date(Date.now() + 3600000); // 1 hour
             res
             .cookie('access_token', token, { httpOnly: true, expires: expiryDate })
+            .header('Authorization', 'Bearer ' + token) 
             .status(200)
             .json(rest);
         } catch (error:any) {

@@ -26,7 +26,7 @@ class ComplaintController {
             
             // ML model calls
             try {
-                let response = await axios.post('http://127.0.0.1:5000/getSummary', {
+                let response = await axios.post('http://127.0.0.1:5002/getSummary', {
                     message: complaint_to_be_added
                 }, {
                     headers: {
@@ -38,7 +38,7 @@ class ComplaintController {
                 mycomplaint.summarized_complaint = data.summary;
 
                 // Get score and normalize
-                response = await axios.post('http://127.0.0.1:5000/getScore', {
+                response = await axios.post('http://127.0.0.1:5002/getScore', {
                     complaint: complaint_to_be_added
                 }, {
                     headers: {
@@ -47,9 +47,10 @@ class ComplaintController {
                 });
                 data = response.data;
                 let score = data.index;
-                response = await axios.post('http://127.0.0.1:5000/normalize', {
+                let mylist=[issue_category];
+                response = await axios.post('http://127.0.0.1:5002/normalize', {
                     score: score,
-                    categories: issue_category
+                    categories: mylist,
                 }, {
                     headers: {
                         'Content-Type': 'application/json'
@@ -57,6 +58,7 @@ class ComplaintController {
                 });
                 data = response.data;
                 mycomplaint.priority_factor = data.complaint_severity_score;
+                console.log(mycomplaint.priority_factor)
             } catch (e) {
                 console.log("Error:", e);
             }
@@ -79,7 +81,8 @@ class ComplaintController {
     }
 
     async getMyComplaints(req: Request, res: Response) {
-        const { uuid } = req.body;
+        const { user } = req.body;
+        const uuid = user.uuid;
         try {
             let user = await User.findOne({ uuid })
             if (user === null) {
@@ -109,7 +112,8 @@ class ComplaintController {
     }
 
     async getComplaintStats(req: Request, res: Response) {
-        const { uuid } = req.body;
+        const { user } = req.body;
+        const uuid = user.uuid;
         try {
             let user = await User.findOne({ uuid })
             if (user === null) {
@@ -139,7 +143,7 @@ class ComplaintController {
             let todos = 0;
     
             for (let j = 0; j < newlist.length; j++) {
-                if (newlist[j].status === "resolved") {
+                if (newlist[j].status === "completed") {
                     completed++;
                 } else if (newlist[j].status === "Under Investigation" || newlist[j].status === "in-progress") {
                     inProgress++;
