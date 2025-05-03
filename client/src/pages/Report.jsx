@@ -83,33 +83,35 @@ const ReportGenerator = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Summary</th>
-              <th>Complaint</th>
-              <th>Proof</th>
-              <th>Last Update</th>
+            <th style={styles.th}>Title</th>
+            <th style={styles.th}>Category</th>
+            <th style={styles.th}>Status</th>
+            <th style={styles.th}>Priority</th>
+            <th style={styles.th}>Summary</th>
+            <th style={styles.th}>Complaint</th>
+            <th style={styles.th}>Proof</th>
+            <th style={styles.th}>Last Update</th>
             </tr>
           </thead>
           <tbody>
             {responseData.length > 0 ? responseData.map((item, idx) => (
               <tr key={idx}>
-                <td>{item.title}</td>
-                <td>{item.issue_category?.join(', ')}</td>
-                <td>{item.status}</td>
-                <td>{item.priority_factor}</td>
-                <td>{item.summarized_complaint}</td>
-                <td>{item.complaint}</td>
-                <td>
+                <td style={styles.td}>{item.title}</td>
+                <td style={styles.td}>{item.issue_category?.join(', ')}</td>
+                <td style={styles.td}>{item.status}</td>
+                <td style={styles.td}>{item.priority_factor}</td>
+                <td style={styles.td}>{item.summarized_complaint}</td>
+                <td style={styles.td}>{item.complaint}</td>
+                <td style={styles.td}>
                   <a href={item.complaint_proof} target="_blank" rel="noopener noreferrer">Proof</a>
                 </td>
-                <td>{item.lastupdate ? new Date(item.lastupdate).toLocaleString() : ''}</td>
+                <td style={styles.td}>
+                  {item.lastupdate ? new Date(item.lastupdate).toLocaleString() : ''}
+                </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center' }}>No data yet</td>
+                <td style={styles.td} colSpan="8" align="center">No data yet</td>
               </tr>
             )}
           </tbody>
@@ -155,8 +157,21 @@ const styles = {
   },
   table: {
     width: '100%',
-    borderCollapse: 'collapse',
+    borderCollapse: 'separate',
+    borderSpacing: '0',
     marginTop: '20px',
+  },
+  th: {
+    padding: '12px',
+    backgroundColor: '#f2f2f2',
+    border: '1px solid #ccc',
+    fontWeight: 'bold',
+    textAlign: 'left',
+  },
+  td: {
+    padding: '12px',
+    border: '1px solid #ddd',
+    verticalAlign: 'top',
   },
 };
 
