@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { getPriority } from '../utils';
 
 const ReportGenerator = () => {
   const [input, setInput] = useState('');
@@ -87,7 +88,6 @@ const ReportGenerator = () => {
             <th style={styles.th}>Category</th>
             <th style={styles.th}>Status</th>
             <th style={styles.th}>Priority</th>
-            <th style={styles.th}>Summary</th>
             <th style={styles.th}>Complaint</th>
             <th style={styles.th}>Proof</th>
             <th style={styles.th}>Last Update</th>
@@ -99,11 +99,10 @@ const ReportGenerator = () => {
                 <td style={styles.td}>{item.title}</td>
                 <td style={styles.td}>{item.issue_category?.join(', ')}</td>
                 <td style={styles.td}>{item.status}</td>
-                <td style={styles.td}>{item.priority_factor}</td>
-                <td style={styles.td}>{item.summarized_complaint}</td>
+                <td style={styles.td}>{getPriority(item.priority_factor)}</td>
                 <td style={styles.td}>{item.complaint}</td>
                 <td style={styles.td}>
-                  <a href={item.complaint_proof} target="_blank" rel="noopener noreferrer">Proof</a>
+                  <a href={item.complaint_proof} target="_blank" rel="noopener noreferrer">Click Here for Proof</a>
                 </td>
                 <td style={styles.td}>
                   {item.lastupdate ? new Date(item.lastupdate).toLocaleString() : ''}

@@ -16,7 +16,8 @@ import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import DescriptionWithNextButton from "./pages/DescriptionWithNextButton";
 import ChooseUser from "./pages/ChooseUser";
-import Inprogress from "./pages/completed";
+import Completed from "./pages/completed";
+import Inprogress from "./pages/Inprogress";
 import Todo from "./pages/todo";
 import ReportGenerator from "./pages/Report";
 
@@ -105,7 +106,7 @@ function App() {
           <Route index path='/' element={<Navigate to='/des' />} />
           <Route path='/dashboard' element={<Dashboard />} />
           <Route path='/tasks' element={<Tasks />} />
-          <Route path='/completed/:status' element={<Tasks />} />
+          <Route path='/completed/:status' element={<Completed />} />
           <Route path='/in-progress/:status' element={<Inprogress />} />
           <Route path='/todo/:status' element={<Todo />} />
           <Route path='/team' element={<Users />} />

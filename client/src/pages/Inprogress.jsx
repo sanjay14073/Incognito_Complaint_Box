@@ -25,7 +25,7 @@ const TASK_TYPE = {
   completed: "bg-green-600",
 };
 
-const Completed = () => {
+const Inprogress = () => {
   
 
   const [selected, setSelected] = useState(0);
@@ -43,7 +43,7 @@ const Completed = () => {
         const response = await fetch(endpoint , {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: "resolved" }),
+          body: JSON.stringify({ status: "in-progress" }),
         });
         const data = await response.json();
         setComplaints(data.complaints || []);
@@ -102,4 +102,4 @@ const Completed = () => {
   );
 };
 
-export default Completed;
+export default Inprogress;
